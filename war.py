@@ -22,6 +22,9 @@
 #
 # https://en.wikipedia.org/wiki/War_(card_game)
 
+# the game below can still be refactored to run faster, have less code, look better and make it DRY.
+# Yet the basic ideas are there
+
 from random import shuffle
 import os
 
@@ -38,6 +41,8 @@ class Deck:
     """
     SUITS = 'H D S C'.split()
     RANKS = '2 3 4 5 6 7 8 9 10 J Q K A'.split()
+
+
 
     def __init__(self):
         self.deck = []
@@ -246,7 +251,14 @@ def second_tie_war(first_player, second_player):
     count = 4
     while(first_player.hand[count][1] == second_player.hand[count][1]):
         count += 2
+        res1 = input("\n\nWhat?........... It's another tie. Press enter to continue Tie Breaker War")
         if len(first_player.hand) >= count and len(second_player.hand) >= count:
+            os.system('clear')
+            print("PlayerOne's cards: ")
+            print([(' ', ' '), first_player.hand[count]])
+            print("\n\nPlayerTwo's cards: ")
+            print([(' ', ' '), second_player.hand[count]])
+            res3 = input("press enter to continue")
             if first_player.hand[count][1] != second_player.hand[count][1]:
                 first_wins = get_highest_rank(first_player.hand[count][1], second_player.hand[count][1])
                 if first_wins:
@@ -254,6 +266,9 @@ def second_tie_war(first_player, second_player):
                 else:
                     print('\nwinning card: ', second_player.hand[count][1])
                 adjust_many((first_player.hand, second_player.hand), first_wins, count)
+                res2 = input('press enter to continue to next round')
+            else:
+                continue
         else:
             if len(first_player.hand) > len(second_player.hand):
                 print("Player One wins the game!")
@@ -268,7 +283,7 @@ def adjust_many(hands, is_true, count):
     and add them to the winning player's cards
     """
     for i, (player_one_card, player_two_card) in enumerate(zip(*hands)):
-        if i == count:
+        if i > count:
             break
         if is_true:
             hands[0].append(player_two_card)
@@ -331,7 +346,8 @@ def start_war_game():
                 #check to see if there is a tie again
                 if player_one.hand[4][1] == player_two.hand[4][1]:
                     second_tie_war(player_one, player_two)
-
+                    if check_winner(player_one, player_two):
+                        break
                 # if not a tie again, get round winner and adjust player's cards
                 else:
                     one_wins = get_highest_rank(player_one.hand[4][1], player_two.hand[4][1])
